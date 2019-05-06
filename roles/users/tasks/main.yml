@@ -1,0 +1,12 @@
+- name: Create New User
+  user:
+    name: smc
+    password: "{{ smc_password }}"
+    groups: sudo
+    shell: /bin/bash
+
+- name: Add Authorized Key
+  authorized_key:
+    user: smc
+    key: "{{ shared_publickey }}"
+    state: present
