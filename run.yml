@@ -1,7 +1,8 @@
 ---
-- hosts: pi
+- hosts: all
   user: aos
   become: yes
   become_method: sudo
   roles:
-    - users
+    - { role: users, tags: [users] }
+    - { role: docker, tags: [docker] }
