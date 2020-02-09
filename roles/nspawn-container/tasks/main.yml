@@ -1,0 +1,58 @@
+---
+- name: Ensure proper tools are installed
+  apt:
+    name: debootstrap,systemd-container
+    state: present
+
+- name: "Stop existing container if it is running"
+  systemd:
+    name: "systemd-nspawn@{{ hostname }}"
+    state: stopped
+
+- name: "Make necessary directories for {{ hostname }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ bootstrap_directory }}"
+    - "/etc/systemd/nspawn"
+
+- name: Debootstrap a rootfs
+  command:
+    cmd: "debootstrap --include=openssh-server,python3-apt,dbus,sudo buster {{ bootstrap_directory }}"
+    creates: "{{ bootstrap_directory }}/etc/os-release"
+
+- name: "Set hostname of container to {{ hostname }}"
+  copy:
+    dest: "{{ bootstrap_directory }}/etc/hostname"
+    content: "{{ hostname }}"
+    owner: root
+    group: root
+
+- name: "Set up systemd nspawn file {{ hostname }}.nspawn"
+  template:
+    src: "container.nspawn"
+    dest: "/etc/systemd/nspawn/{{ hostname }}.nspawn"
+
+- name: Enable systemd-networkd in container
+  command: >
+    {{ run_in_container }} systemctl enable systemd-networkd.service systemd-resolved.service
+
+- name: Allow sudoers to sudo without password
+  lineinfile:
+    path: "{{ bootstrap_directory }}/etc/sudoers"
+    state: present
+    regex: "^%sudo"
+    line: "%sudo ALL=(ALL:ALL) NOPASSWD: ALL"
+    validate: "/usr/sbin/visudo -cf %s"
+
+- name: Enable machines.target
+  systemd:
+    name: machines.target
+    enabled: yes
+
+- name: "Start and enable {{ hostname }}"
+  systemd:
+    name: "systemd-nspawn@{{ hostname }}"
+    state: started
+    enabled: yes

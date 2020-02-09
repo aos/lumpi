@@ -1,8 +1,19 @@
 ---
 - hosts: all
-  user: aos
+  gather_facts: yes
   become: yes
-  become_method: sudo
+
+  pre_tasks:
+    - name: Update apt cache if necessary
+      apt: update_cache=true cache_valid_time=3600
+
   roles:
-    - { role: users, tags: [users] }
-    - { role: docker, tags: [docker] }
+    - role: bootstrap
+      tags: ["bootstrap"]
+
+    - role: nspawn-container
+      vars:
+        hostname: "web"
+        port_forwards:
+          - "tcp:8000:8000"
+      tags: ["web"]

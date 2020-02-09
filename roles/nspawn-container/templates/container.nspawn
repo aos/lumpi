@@ -1,0 +1,9 @@
+[Exec]
+Boot=yes
+
+{% if port_forwards is defined %}
+[Network]
+{% for forward in port_forwards %}
+Port={{ forward }}
+{% endfor %}
+{% endif %}

@@ -1,0 +1,9 @@
+---
+# The name of the container
+hostname: my-container
+
+# Where the rootfs of the image will live
+bootstrap_directory: /var/lib/machines/{{ hostname }}
+
+# Command to run a command in the container
+run_in_container: systemd-nspawn -D {{ bootstrap_directory }} --private-network

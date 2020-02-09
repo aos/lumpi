@@ -1,0 +1,5 @@
+---
+apt_packages:
+  - avahi-daemon
+  - openssh-server
+  - curl
