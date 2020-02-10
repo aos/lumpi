@@ -1,0 +1,24 @@
+---
+# Make BTRFS
+- name: Allocate space for btrfs filesystem
+  command:
+    cmd: "fallocate -l 5G machines.raw"
+    chdir: "/var/lib"
+    creates: "machines.raw"
+
+- name: Create btrfs filesystem
+  filesystem:
+    dev: "/var/lib/machines.raw"
+    fstype: btrfs
+
+- name: Mount btrfs to /var/lib/machines
+  mount:
+    path: "/var/lib/machines"
+    src: "/var/lib/machines.raw"
+    fstype: btrfs
+    state: mounted
+    opts: loop
+
+- name: Disable the size limit
+  command:
+    cmd: "machinectl set-limit -"
