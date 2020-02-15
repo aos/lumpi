@@ -3,17 +3,17 @@
   gather_facts: yes
   become: yes
 
-  pre_tasks:
-    - name: Update apt cache if necessary
-      apt: update_cache=true cache_valid_time=3600
+  vars:
+    pip_package: python3-pip
+    pip_install_packages:
+      - docker
 
   roles:
-    - role: bootstrap
-      tags: ["bootstrap"]
+    - role: common
+      tags: ['common']
+      
+    - role: geerlingguy.pip
+      tags: ['pip']
 
-    - role: nspawn-container
-      vars:
-        hostname: "web"
-        port_forwards:
-          - "tcp:8000:8000"
-      tags: ["web"]
+    - role: geerlingguy.docker
+      tags: ['docker']
