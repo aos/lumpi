@@ -11,6 +11,9 @@
   roles:
     - role: common
       tags: ['common']
+
+    - role: users
+      tags: ['users']
       
     - role: geerlingguy.pip
       tags: ['pip']
