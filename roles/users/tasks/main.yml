@@ -1,8 +1,16 @@
 ---
-- name: Add Authorized Key
+- name: Create aos user
+  user:
+    name: aos
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+
+- name: Add authorized keys
   authorized_key:
     user: aos
-    key: "{{ item['pubkey'] }}"
+    key: "{{ item }}"
     state: present
   with_items:
-    - "{{ pubkeys }}"
+    - "https://github.com/aos.keys"
+    - "https://github.com/aos-vs.keys"
